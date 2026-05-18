@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Gallery - Earn Money</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        header {
+            background: #ff0000;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 24px;
+        }
+
+        .search-bar {
+            padding: 20px;
+            text-align: center;
+            background: #2a2a2a;
+        }
+
+        .search-bar input {
+            padding: 10px;
+            width: 300px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .video-card {
+            background: #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .video-card:hover {
+            transform: scale(1.05);
+        }
+
+        .video-card iframe {
+            width: 100%;
+            height: 170px;
+            border: none;
+        }
+
+        .video-info {
+            padding: 10px;
+        }
+
+        .video-title {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .video-views {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .sidebar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 300px;
+            height: 100%;
+            background: #2a2a2a;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .popular-videos {
+            margin-top: 20px;
+        }
+
+        .popular-item {
+            display: flex;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .popular-item img {
+            width: 80px;
+            height: 45px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .popular-item span {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎬 My Video Hub</h1>
+    </header>
+
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search videos...">
+        <button onclick="searchVideos()">Search</button>
+    </div>
+
+    <main class="video-grid" id="videoGrid">
+        <!-- Videos will be loaded here -->
+    </main>
+
+    <script>
+        // YouTube API Key (Aapko Google se free API key mil jayega)
+        // Visit: https://console.cloud.google.com/
+        const API_KEY = 'YOUR_API_KEY';
+
+        // Default popular videos (Trending)
+        const popularVideoIds = [
+            'dQw4w9WgXcQ', // Example video
+            'jNQXAC9IVRw',
+            'M7lc1UVf-VE',
+            '9bZkp7q19f0'
+        ];
+
+        async function searchVideos() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+
+            const response = await fetch(
+                `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${query}&type=video&key=${API_KEY}`
+            );
+            const data = await response.json();
+            displayVideos(data.items);
+        }
+
+        function displayVideos(videos) {
+            const grid = document.getElementById('videoGrid');
+            grid.innerHTML = '';
+
+            videos.forEach(video => {
+                const videoId = video.id.videoId;
+                const title = video.snippet.title;
+                const thumbnail = video.snippet.thumbnails.medium.url;
+
+                grid.innerHTML += `
+                    <div class="video-card" onclick="playVideo('${videoId}')">
+                        <img src="${thumbnail}" alt="${title}">
+                        <div class="video-info">
+                            <div class="video-title">${title}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function playVideo(videoId) {
+            // Open video in new tab or embed
+            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+        }
+
+        // Load default videos on start
+        window.onload = async () => {
+            if (API_KEY !== 'YOUR_API_KEY') {
+                // Fetch trending if API key is set
+            }
+            // Show demo cards if no API
+            displayDemoCards();
+        };
+
+        function displayDemoCards() {
+            const demoVideos = [
+                { id: 'dQw4w9WgXcQ', title: 'Rick Astley - Never Gonna Give You Up' },
+                { id: 'jNQXAC9IVRw', title: 'Me at the zoo' },
+                { id: 'M7lc1UVf-VE', title: 'YouTube Developers Live' }
+            ];
+
+            const grid = document.getElementById('videoGrid');
+            demoVideos.forEach(video => {
+                grid.innerHTML += `
+                    <div class="video-card" onclick="playVideo('${video.id}')">
+                        <iframe src="https://www.youtube.com/embed/${video.id}" allowfullscreen></iframe>
+                        <div class="video-info">
+                            <div class="video-title">${video.title}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
